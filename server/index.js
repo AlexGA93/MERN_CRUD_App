@@ -20,7 +20,6 @@ app.use(express.urlencoded({extended: false}));
 // routes
 app.use('/api/goals', require('./routes/goalRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/goals', require('./routes/goalRoutes'));
 
 // middleware implementation
 app.use(errorHandler);
