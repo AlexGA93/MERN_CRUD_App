@@ -22,7 +22,17 @@ const postUsers = asyncHandler(async (req, res) =>{
         res.status(400)// .json({message:'Please add a name field'});
         throw new Error('Please add a name field')
     }
-    res.status(200).json({message:'post users'});
+    // res.status(200).json({message:'post users'});
+
+    // create a new user
+    const user = await User.create({
+        name: req.body.name,
+        second_name: req.body.second_name,
+        age: req.body.age,
+        bio: req.body.bio
+    });
+
+    res.status(200).json(user)
 });
 
 // @desc    Update users
