@@ -1,85 +1,99 @@
-// asyc handler
-const asyncHandler = require('express-async-handler');
 
-// mongoose schema
-const User = require('../models/usersModels');
+const asyncHandler = require('express-async-handler')
+const User = require('../models/usersModels')
+// jwt
+const jwt = require('jsonwebtoken');
+// Hashing passwords
+const bcrypt = require('bcryptjs');
 
-// @desc    Get users
-// @route   GET /api/users
-// @access  private
-const getUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:'get users'});
-    const users = await User.find();
-    res.status(200).json(users);
+
+
+// @desc    Register new User
+// @route   POST /api/users
+// @access  Public
+const registerUser = asyncHandler (async (req, res) => {
+
+    const {name, email, password} = req.body;
+
+    // validation
+    if(!name || !email || !password){
+        res.status(400);
+        throw new Error ('Please add all the fields');
+    }
+
+    // user exists?
+    const userExists = await User.findOne({email});
+    if(userExists){
+        res.status(400);
+        throw new Error ('User already exists');
+    }
+
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // create user
+    const user = await User.create({name, email, password: hashedPassword});
+
+    if(user){
+        res.status(201).json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            token: JWT(user._id)
+        });
+    }else {
+        res.status(400)
+        throw new Error('Invalid user data');
+    }
 });
 
-// @desc    Create users
-// @route   POST /api/users/:id
-// @access  private
-const postUsers = asyncHandler(async (req, res) =>{
-    //error and exception handling
-    if(!req.body.name){
-        res.status(400)// .json({message:'Please add a name field'});
-        throw new Error('Please add a name field')
-    }
-    // res.status(200).json({message:'post users'});
+// @desc    Authenticate User
+// @route   POST /api/users/login
+// @access  Public
+const loginUser = asyncHandler(async (req, res) => {
+    // extract body request data
+    const {email, password} = req.body;
+    //find for user email
+    const user = await User.findOne({email});
 
-    // create a new user
-    const user = await User.create({
-        name: req.body.name,
-        second_name: req.body.second_name,
-        age: req.body.age,
-        bio: req.body.bio
+    if(user && (
+        await bcrypt.compare(password, user.password)
+    )){
+        res.json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            token: JWT(user._id)
+        });
+    }else{
+        res.status(400)
+        throw new Error('Invalid user credentials');
+    }
+});
+
+// @desc    Get User data
+// @route   GET /api/users/me
+// @access  Private
+const getMe = asyncHandler(async (req, res) => {
+    // console.log(req);
+    // res.status(200).json(req.user);
+    const {_id, name, email} = await User.findById(req.user.id);
+
+    res.status(200).json({
+        id: _id,
+        name,
+        email
     });
-
-    res.status(200).json(user)
 });
 
-// @desc    Update users
-// @route   PUT /api/users/:id
-// @access  private
-const putUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:`update user ${req.params.id}`});
+// Generate JWT
+const JWT = (id) => {
+    return jwt.sign({id}, process.env.JWT_SECRET, { expiresIn: '30d'});
+};
 
-    // first step is get the user by id
-    const user = await User.findById(req.params.id);
-
-    // error case
-    if (!user) {
-        res.status(400).json() 
-        throw new Error('User not found');
-    }
-
-    // updated user (id, data to update, new value)
-    const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {new: true}
-    );
-
-    // response
-    res.status(200).json(updatedUser);
-    
-});
-
-// @desc    Delete users
-// @route   DELETE /api/users?:id
-// @access  private
-const deleteUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:`delete user ${req.params.id}`});
-
-    // first step is get the user by id
-    const user = await User.findById(req.params.id);
-
-    // error case
-    if (!user) {
-        res.status(400).json() 
-        throw new Error('User not found');
-    }
-
-    await User.deleteOne(user);
-    res.status(200).json('User Deleted');
-});
-
-//exportin methods
-module.exports = {getUsers, postUsers, putUsers, deleteUsers};
+module.exports = {
+  registerUser,
+  loginUser,
+  getMe,
+}

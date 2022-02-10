@@ -3,11 +3,19 @@ const express = require('express');
 const router = express.Router();
 
 // importing controllers
-const {getUsers, postUsers, putUsers, deleteUsers} = require('../controllers/usersController');
+const {
+  registerUser,
+  loginUser,
+  getMe,
+} = require('../controllers/usersController');
+
+// middleware
+const { protect } = require('../middleware/authMiddleware');
 
 // groups of routes
-router.route('/').get(getUsers).post(postUsers);
-router.route('/:id').put(putUsers).delete(deleteUsers);
+router.post('/', registerUser)
+router.post('/login', loginUser)
+router.get('/me', protect, getMe)
 
 //exporting script
 module.exports = router;

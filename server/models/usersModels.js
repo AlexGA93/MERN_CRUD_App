@@ -7,16 +7,13 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add a proper user name']
     },
-    second_name: {
+    email: {
         type: String,
-        required: [true, 'Please add a proper user second name']
+        required: [true, 'Please add a proper user email']
     },
-    age: {
-        type: Number,
-        required: [true, 'Please add a user age']
-    },
-    bio: {
-        type: String
+    password: {
+        type: String,
+        required: [true, 'Please add a user password']
     }
 },
 {
