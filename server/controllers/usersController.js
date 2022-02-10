@@ -1,85 +1,55 @@
-// asyc handler
-const asyncHandler = require('express-async-handler');
 
-// mongoose schema
-const User = require('../models/usersModels');
+const asyncHandler = require('express-async-handler')
+const User = require('../models/usersModels')
+// jwt
+const jwt = require('jsonwebtoken');
+// Hashing passwords
+const bcrypt = require('bcryptjs');
 
-// @desc    Get users
-// @route   GET /api/users
-// @access  private
-const getUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:'get users'});
-    const users = await User.find();
-    res.status(200).json(users);
-});
 
-// @desc    Create users
-// @route   POST /api/users/:id
-// @access  private
-const postUsers = asyncHandler(async (req, res) =>{
-    //error and exception handling
-    if(!req.body.name){
-        res.status(400)// .json({message:'Please add a name field'});
-        throw new Error('Please add a name field')
-    }
-    // res.status(200).json({message:'post users'});
 
-    // create a new user
-    const user = await User.create({
-        name: req.body.name,
-        second_name: req.body.second_name,
-        age: req.body.age,
-        bio: req.body.bio
-    });
+// @desc    Register new User
+// @route   POST /api/users
+// @access  Public
+const registerUser = asyncHandler (async (req, res) => {
 
-    res.status(200).json(user)
-});
+    const {name, email, password} = req.body;
 
-// @desc    Update users
-// @route   PUT /api/users/:id
-// @access  private
-const putUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:`update user ${req.params.id}`});
-
-    // first step is get the user by id
-    const user = await User.findById(req.params.id);
-
-    // error case
-    if (!user) {
-        res.status(400).json() 
-        throw new Error('User not found');
+    // validation
+    if(!name || !email || !password){
+        res.status(400);
+        throw new Error ('Please add all the fields');
     }
 
-    // updated user (id, data to update, new value)
-    const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {new: true}
-    );
+    // user exists?
+    const userExists = await User.findOne({email});
+    if(userExists){
+        res.status(400);
+        throw new Error ('User already exists');
+    }
 
-    // response
-    res.status(200).json(updatedUser);
+    // hash password
     
+
+    res.json({message: 'Register User'});
 });
 
-// @desc    Delete users
-// @route   DELETE /api/users?:id
-// @access  private
-const deleteUsers = asyncHandler(async (req, res) =>{
-    // res.status(200).json({message:`delete user ${req.params.id}`});
-
-    // first step is get the user by id
-    const user = await User.findById(req.params.id);
-
-    // error case
-    if (!user) {
-        res.status(400).json() 
-        throw new Error('User not found');
-    }
-
-    await User.deleteOne(user);
-    res.status(200).json('User Deleted');
+// @desc    Login User
+// @route   POST /api/users/login
+// @access  Public
+const loginUser = asyncHandler(async (req, res) => {
+    res.json({message: 'Login User'});
 });
 
-//exportin methods
-module.exports = {getUsers, postUsers, putUsers, deleteUsers};
+// @desc    Get User data
+// @route   GET /api/users/me
+// @access  Public
+const getMe = asyncHandler(async (req, res) => {
+    res.json({message: 'Get me'});
+});
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getMe,
+}
