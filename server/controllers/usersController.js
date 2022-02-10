@@ -39,7 +39,27 @@ const postUsers = asyncHandler(async (req, res) =>{
 // @route   PUT /api/users/:id
 // @access  private
 const putUsers = asyncHandler(async (req, res) =>{
-    res.status(200).json({message:`update user ${req.params.id}`});
+    // res.status(200).json({message:`update user ${req.params.id}`});
+
+    // first step is get the user by id
+    const user = await User.findById(req.params.id);
+
+    // error case
+    if (!user) {
+        res.status(400).json() 
+        throw new Error('User not found');
+    }
+
+    // updated user (id, data to update, new value)
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new: true}
+    );
+
+    // response
+    res.status(200).json(updatedUser);
+    
 });
 
 // @desc    Delete users
