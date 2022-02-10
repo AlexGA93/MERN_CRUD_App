@@ -2,25 +2,24 @@
 const express = require('express');
 const router = express.Router();
 
-// get users route
-router.get('/', (req, res) => {
-    res.status(200).json({message:'get users'})
-});
+// importing controllers
+const {getUsers, postUsers, putUsers, deleteUsers} = require('../controllers/usersController');
 
-// porst/ create users route
-router.post('/', (req, res) => {
-    res.status(200).json({message:'post users'})
-});
+// groups of routes
+router.route('/').get(getUsers).post(postUsers);
+router.route('/:id').put(putUsers).delete(deleteUsers);
 
-// update users route
-router.put('/:id', (req, res) => {
-    res.status(200).json({message:`update user ${req.params.id}`})
-});
+// // get users route
+// router.get('/', getUsers);
 
-// delete users route
-router.delete('/:id', (req, res) => {
-    res.status(200).json({message:`delete user ${req.params.id}`})
-});
+// // porst/ create users route
+// router.post('/', postUsers);
+
+// // update users route
+// router.put('/:id', putUsers);
+
+// // delete users route
+// router.delete('/:id', deleteUsers);
 
 //exporting script
 module.exports = router;
