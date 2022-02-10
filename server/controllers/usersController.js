@@ -11,7 +11,11 @@ const getUsers = (req, res) =>{
 // @route   POST /api/users/:id
 // @access  private
 const postUsers = (req, res) =>{
-    console.log(req.body.name);
+    //error and exception handling
+    if(!req.body.name){
+        res.status(400)// .json({message:'Please add a name field'});
+        throw new Error('Please add a name field')
+    }
     res.status(200).json({message:'post users'});
 };
 

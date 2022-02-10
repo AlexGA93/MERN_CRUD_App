@@ -1,5 +1,6 @@
 // express dependencies
 const express = require('express');
+const { errorHandler } = require('./middleware/errorMiddleware');
 const dotenv = require('dotenv').config();
 
 // port assignation
@@ -13,5 +14,8 @@ app.use(express.urlencoded({extended: false}));
 
 // routes
 app.use('/api/users', require('./routes/userRoutes'));
+
+// middleware implementation
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`Server running at port ${port}`));
