@@ -1,11 +1,16 @@
 // asyc handler
 const asyncHandler = require('express-async-handler');
 
+// mongoose schema
+const User = require('../models/usersModels');
+
 // @desc    Get users
 // @route   GET /api/users
 // @access  private
 const getUsers = asyncHandler(async (req, res) =>{
-    res.status(200).json({message:'get users'});
+    // res.status(200).json({message:'get users'});
+    const users = await User.find();
+    res.status(200).json(users);
 });
 
 // @desc    Create users
