@@ -66,7 +66,19 @@ const putUsers = asyncHandler(async (req, res) =>{
 // @route   DELETE /api/users?:id
 // @access  private
 const deleteUsers = asyncHandler(async (req, res) =>{
-    res.status(200).json({message:`delete user ${req.params.id}`});
+    // res.status(200).json({message:`delete user ${req.params.id}`});
+
+    // first step is get the user by id
+    const user = await User.findById(req.params.id);
+
+    // error case
+    if (!user) {
+        res.status(400).json() 
+        throw new Error('User not found');
+    }
+
+    await User.deleteOne(user);
+    res.status(200).json('User Deleted');
 });
 
 //exportin methods
