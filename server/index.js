@@ -1,7 +1,12 @@
 // express dependencies
 const express = require('express');
+const colors = require('colors');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const dotenv = require('dotenv').config();
+
+// connecttion to MongoDB
+const connectDB = require('./config/db');
+connectDB();
 
 // port assignation
 const port = process.env.PORT | 5000;
