@@ -1,12 +1,12 @@
 const asyncHandler = require('express-async-handler')
 
-const Goal = require('../models/goalsModel')
+const Goal = require('../models/goalsModels');
 
 // @desc    Get goals
 // @route   GET /api/goals
 // @access  Private
 const getGoals = asyncHandler(async (req, res) => {
-  const goals = await Goal.find()
+  const goals = await Goal.find();
 
   res.status(200).json(goals)
 })
