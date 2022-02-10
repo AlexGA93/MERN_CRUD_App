@@ -11,6 +11,7 @@ const getUsers = (req, res) =>{
 // @route   POST /api/users/:id
 // @access  private
 const postUsers = (req, res) =>{
+    console.log(req.body.name);
     res.status(200).json({message:'post users'});
 };
 
