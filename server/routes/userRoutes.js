@@ -1,4 +1,4 @@
-// implementng express as router to define all the routes
+
 const express = require('express');
 const router = express.Router();
 
